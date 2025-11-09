@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import {
   FaSearch,
   FaRegHeart,
@@ -11,10 +12,44 @@ import { MdCardGiftcard } from "react-icons/md";
 import { BsFillMicFill } from "react-icons/bs";
 import logo from "../assets/image/Logo.png";
 import { Link } from "react-router-dom";
+import { app } from "../fireconfig";
 
 export default function Header() {
   const [cartCount, setCartCount] = useState(2); // demo cart count
   const [loginOpen, setLoginOpen] = useState(false); // modal state
+
+  const provider = new GoogleAuthProvider();
+  const auth = getAuth(app);
+
+  const loginwork = () => {
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+
+      //  console.log("token", token);
+      //   console.log("user", user);
+      //   console.log("credential", credential);
+
+
+      }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+
+  }
 
   return (
     <header className="w-full shadow-md border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -71,9 +106,9 @@ export default function Header() {
           </div>
 
           {/* Wishlist */}
-            <Link to={"/wishlist"}>
-                <FaRegHeart className="text-lg md:text-xl cursor-pointer hover:text-pink-500 transition-colors" />
-            </Link>
+          <Link to={"/wishlist"}>
+            <FaRegHeart className="text-lg md:text-xl cursor-pointer hover:text-pink-500 transition-colors" />
+          </Link>
 
           {/* User */}
           <div>
@@ -137,7 +172,7 @@ export default function Header() {
             </p>
 
             {/* Google Signin */}
-            <button className="w-full flex items-center justify-center border rounded-md py-2 mt-6 gap-2 hover:bg-gray-50">
+            <button onClick={loginwork} className="w-full flex items-center justify-center border rounded-md py-2 mt-6 gap-2 hover:bg-gray-50">
               <img
                 src="https://www.svgrepo.com/show/355037/google.svg"
                 alt="Google"
